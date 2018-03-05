@@ -6,16 +6,22 @@ import (
 	"os"
 )
 
-type Room struct {
-	description string
-	queryText string
-	options []string
-	results []string
-}
+var (
+	username string
+	reader = bufio.NewReader(os.Stdin)
+)
 
 func printWithNewline(text string) {
 	fmt.Print(text, "\n")
 }
+
+type Room struct {
+	description string
+	queryText string
+	options []string
+	results map[string]string
+}
+
 
 func (room Room) query() string {
 	printWithNewline(room.description)
@@ -27,31 +33,29 @@ func (room Room) query() string {
 
 	printWithNewline("")
 
-	action, _ := reader.ReadString('\n')
+	res, _ := reader.ReadString('\n')
 
-	return room.results[int(action)]
+	// use first byte of response
+	action := res[0:1]
+
+	return room.results[action]
 }
-
-var (
-	username string
-	reader = bufio.NewReader(os.Stdin)
-)
 
 func getUserName() {
 	fmt.Print("Enter username: ")
 	username, _ = reader.ReadString('\n')
-}
-
-func explore(room Room) {
-
+	fmt.Printf("Hello, %s", username)
 }
 
 func main() {
 	getUserName()
-	fmt.Printf("Hello, %s", username)
-	room := Room{"You are in a room.", "What do you want to do?", []string{"Go to the door"}, []string{"You go to the door."}}
 
-	action := room.query()
+	roomResults := make(map[string]string)
+	roomResults["0"] = "You went to the door."
 
-	fmt.Print(action)
+	room := Room{"You are in a room.", "What do you want to do?", []string{"Go to the door"}, roomResults}
+
+	res := room.query()
+
+	fmt.Print(res, "\n")
 }
