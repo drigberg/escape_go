@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 var (
@@ -11,51 +12,55 @@ var (
 	reader = bufio.NewReader(os.Stdin)
 )
 
+type Location struct {
+	description string
+	queryText string
+	options [][]string
+}
+
+func isValidIndex(num int, array [][]string) bool {
+	if (num >= 0 && num < len(array)) {
+		return true
+	}
+	return false
+}
+
 func printWithNewline(text string) {
 	fmt.Print(text, "\n")
 }
 
-type Room struct {
-	description string
-	queryText string
-	options []string
-	results map[string]string
-}
 
-
-func (room Room) query() string {
+func (room Location) query() string {
 	printWithNewline(room.description)
-	printWithNewline(room.queryText)
 
 	for i := range room.options {
-		fmt.Printf("%d: %s", i, room.options[i])
+		printWithNewline("")
+		fmt.Printf("%d: %s", i, room.options[i][0])
 	}
 
 	printWithNewline("")
 
-	res, _ := reader.ReadString('\n')
+	var choiceInt = -1
+	var convErr error
+	for isValidIndex(choiceInt, room.options) == false || convErr != nil {
+		printWithNewline(room.queryText)
 
-	// use first byte of response
-	action := res[0:1]
+		choiceStr, _ := reader.ReadString('\n')
+		choiceInt, convErr = strconv.Atoi(choiceStr[0:1])
+	}
 
-	return room.results[action]
+	return room.options[choiceInt][1]
 }
 
 func getUserName() {
 	fmt.Print("Enter username: ")
 	username, _ = reader.ReadString('\n')
-	fmt.Printf("Hello, %s", username)
+	fmt.Printf("Welcome, %s", username)
 }
 
 func main() {
 	getUserName()
-
-	roomResults := make(map[string]string)
-	roomResults["0"] = "You went to the door."
-
-	room := Room{"You are in a room.", "What do you want to do?", []string{"Go to the door"}, roomResults}
-
+	room := Location{"You are in the center of the room.", "What do you want to do?", [][]string{{"Go to the door", "You went to the door."}, {"Look out the window", "The window is blocked up."}}}
 	res := room.query()
-
-	fmt.Print(res, "\n")
+	printWithNewline(res)
 }
