@@ -1,0 +1,36 @@
+center:
+  description: You are in the center of the room.
+  query: What do you want to do?
+  options:
+    - action: Go to the window.
+      result: You go to the window.
+      new_location: window
+    - action: Go to the door.
+      result: You go to the door.
+      new_location: door
+window:
+  description: The window is boarded up by a metal sheet.
+  query: What do you want to do?
+  options:
+    - action: Bang on the window.
+      result: It rattles.
+      new_location: window
+    - action: Go to the door.
+      result: You go to the door.
+      new_location: door
+    - action: Go to the center of the room.
+      result: You go to the center of the room.
+      new_location: center
+door:
+  description: You are at the door.
+  query: What do you want to do?
+  options:
+    - action: Try to open the door.
+      result: It opens.
+      new_location: END
+    - action: Go to the window.
+      result: You go to the window.
+      new_location: window
+    - action: Go to the center of the room.
+      result: You go to the center of the room.
+      new_location: center

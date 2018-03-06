@@ -1,80 +1,43 @@
+/**
+ * Module dependencies
+ */
 package main
 
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"runtime"
 	"os/exec"
+	"io/ioutil"
+	"gopkg.in/yaml.v2"
 )
+
+/**
+ * Module
+ */
 
 var (
 	username string
 	reader = bufio.NewReader(os.Stdin)
 	clear map[string]func()
+	locations map[string]Location
 )
 
+/**
+ * Structs
+ */
 type Location struct {
-	description string
-	queryText string
-	options [][]string
+	Description string
+	QueryText string
+	Options []map[string]string
 }
 
-func isValidIndex(num int, array [][]string) bool {
-	if (num >= 0 && num < len(array)) {
-		return true
-	}
-	return false
-}
-
-func printWithNewline(text string) {
-	fmt.Print(text, "\n")
-}
-
-
-func (location Location) query() string {
-	printWithNewline(location.description)
-
-	for i := range location.options {
-		printWithNewline("")
-		fmt.Printf("%d: %s", i, location.options[i][0])
-	}
-
-	printWithNewline("")
-
-	var choiceInt = -1
-	var convErr error
-	for isValidIndex(choiceInt, location.options) == false || convErr != nil {
-		printWithNewline(location.queryText)
-
-		choiceStr, _ := reader.ReadString('\n')
-		choiceInt, convErr = strconv.Atoi(choiceStr[0:1])
-	}
-
-	CallClear()
-
-	printWithNewline(location.options[choiceInt][1])
-	printWithNewline("")
-
-	return location.options[choiceInt][2]
-}
-
-func getUserName() {
-	fmt.Print("Enter username: ")
-	username, _ = reader.ReadString('\n')
-	fmt.Printf("Welcome, %s", username)
-}
-
-func explore(locations map[string]Location, start string) {
-	key := start
-	for key != "END" {
-		key = locations[key].query()
-	}
-
-	printWithNewline("You won. Nice job. Now go to http://danielrigberg.com to learn more about the guy who got bored and made this silly game.")
-}
-
+/**
+ * Helpers
+ */
 func CallClear() {
 	function, ok := clear[runtime.GOOS]
 	if ok {
@@ -85,7 +48,85 @@ func CallClear() {
 	}
 }
 
+func getLocations() {
+	yamlData, err := ioutil.ReadFile("./locations.yaml")
+
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	err = yaml.Unmarshal([]byte(yamlData), &locations)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	fmt.Printf("--- t:\n%v\n\n", locations)
+}
+
+func printWithNewline(text string) {
+	fmt.Print(text, "\n")
+}
+
+func isValidIndex(num int, array []map[string]string) bool {
+	if (num >= 0 && num < len(array)) {
+		return true
+	}
+	return false
+}
+
+/**
+ * Functionality
+ */
+
+// give options at location, get response
+func (location Location) query() string {
+	printWithNewline(location.Description)
+
+	for i := range location.Options {
+		printWithNewline("")
+		fmt.Printf("%d: %s", i, location.Options[i]["action"])
+	}
+
+	printWithNewline("")
+
+	var choiceInt = -1
+	var convErr error
+	for isValidIndex(choiceInt, location.Options) == false || convErr != nil {
+		printWithNewline(location.QueryText)
+
+		choiceStr, _ := reader.ReadString('\n')
+		choiceInt, convErr = strconv.Atoi(choiceStr[0:1])
+	}
+
+	CallClear()
+
+	printWithNewline(location.Options[choiceInt]["result"])
+	printWithNewline("")
+
+	return location.Options[choiceInt]["new_location"]
+}
+
+// get username
+func getUserName() {
+	fmt.Print("Enter username: ")
+	username, _ = reader.ReadString('\n')
+	fmt.Printf("Welcome, %s", username)
+}
+
+// move between locations based on user choices
+func explore(locations map[string]Location, start string) {
+	key := start
+	for key != "END" {
+		key = locations[key].query()
+	}
+
+	printWithNewline("You won. Nice job. Now go to http://danielrigberg.com to learn more about the guy who got bored and made this silly game.")
+}
+
 func init() {
+	// read location yaml file
+	getLocations()
+
+	// define 'clear' command for each operating system
 	clear = make(map[string]func())
 	clear["linux"] = func() {
 			cmd := exec.Command("clear")
@@ -106,14 +147,9 @@ func init() {
 }
 
 func main() {
-	fmt.Print(runtime.GOOS)
 	CallClear()
-
 	getUserName()
-	locations := make(map[string]Location)
-	locations["center"] = Location{"You are in the center of the room.", "What do you want to do?", [][]string{{"Go to the door", "You go to the door.", "door"}, {"Look out the window", "The window is blocked up.", "window"}}}
-	locations["window"] = Location{"You are at the window. It is boarded up with metal sheets.", "What do you want to do?", [][]string{{"Go to the door", "You go to the door.", "door"}, {"Bang on the window", "It rattles.", "window"}}}
-	locations["door"] = Location{"You are at the door.", "What do you want to do?", [][]string{{"Try to open it", "It opens.", "END"}, {"Go to the window", "You go to the window.", "window"}}}
 
+	// play the game
 	explore(locations, "center")
 }
