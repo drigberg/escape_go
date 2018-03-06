@@ -21,10 +21,8 @@ import (
 var (
 	username string
 	reader = bufio.NewReader(os.Stdin)
-	clear map[string]func()
 	locations map[string]structs.Location
 )
-
 
 // give options at location, get response
 func query(location structs.Location) string {
