@@ -1,6 +1,4 @@
 # escape_go
 Tiny CLI escape room written in Go
 
-To do:
-  - use yaml to define locations
-  - connect location by options
+Find your way out of the room, if you can! (Spoiler: You can.)
