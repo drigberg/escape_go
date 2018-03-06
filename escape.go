@@ -1,6 +1,7 @@
 /**
  * Module dependencies
  */
+
 package main
 
 import (
@@ -29,6 +30,7 @@ var (
 /**
  * Structs
  */
+
 type Location struct {
 	Description string
 	QueryText string
@@ -38,6 +40,7 @@ type Location struct {
 /**
  * Helpers
  */
+
 func CallClear() {
 	function, ok := clear[runtime.GOOS]
 	if ok {
