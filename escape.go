@@ -25,19 +25,9 @@ var (
 	locations map[string]structs.Location
 )
 
-/**
- * Structs
- */
-
-/**
- * Functionality
- */
 
 // give options at location, get response
 func query(location structs.Location) string {
-	fmt.Printf("%v", location)
-	fmt.Printf("%v", locations)
-
 	helpers.PrintWithNewline(location.Description)
 
 	for i := range location.Options {
