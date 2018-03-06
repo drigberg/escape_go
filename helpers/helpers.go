@@ -21,10 +21,10 @@ var (
 	Clear map[string]func()
 )
 
-func GetLocations() map[string]structs.Location {
+func GetLocations(filepath string) map[string]structs.Location {
 	var locations map[string]structs.Location
 
-	yamlData, err := ioutil.ReadFile("./locations.yaml")
+	yamlData, err := ioutil.ReadFile(filepath)
 
 	if err != nil {
 		log.Fatalf("error: %v", err)

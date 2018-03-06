@@ -1,0 +1,17 @@
+left:
+  description: to the left
+  query: go right?
+  options:
+    - action: go right
+      result: you are right
+      new_location: right
+right:
+  description: to the right
+  query: go left?
+  options:
+    - action: go left
+      result: you are left
+      new_location: left
+    - action: end
+      result: you ended
+      new_location: END

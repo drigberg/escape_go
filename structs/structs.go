@@ -2,6 +2,6 @@ package structs
 
 type Location struct {
 	Description string
-	QueryText string
+	Query string
 	Options []map[string]string
 }

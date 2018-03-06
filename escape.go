@@ -40,7 +40,8 @@ func query(location structs.Location) string {
 	var choiceInt = -1
 	var convErr error
 	for helpers.IsValidIndex(choiceInt, location.Options) == false || convErr != nil {
-		helpers.PrintWithNewline(location.QueryText)
+		helpers.PrintWithNewline("")
+		helpers.PrintWithNewline(location.Query)
 
 		choiceStr, _ := reader.ReadString('\n')
 		choiceInt, convErr = strconv.Atoi(choiceStr[0:1])
@@ -73,7 +74,7 @@ func explore(locations map[string]structs.Location, start string) {
 
 func init() {
 	// read location yaml file
-	locations = helpers.GetLocations()
+	locations = helpers.GetLocations("./static/locations.yaml")
 
 	// define 'clear' command for each operating system
 	helpers.Clear = make(map[string]func())
